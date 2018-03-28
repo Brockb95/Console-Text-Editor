@@ -67,26 +67,52 @@ void commandmodeoff(){
 void copyPaste(char choice, int SIZE, char pasted[]){
     if(choice == 'c'){
         printw("Enter text to copy (end with ';'): ");//prompt for copy text
+        int i;
+	int k;
+        for(i = 0; i <= SIZE - 1; i++){
+            int input = getch();//get char from user
+            if (i == SIZE - 1)
+                input = ';';//forced quit
+            switch(input){//deal with special keys
+			case KEY_LEFT:
+                i--;//don't count this iteration
+                break;
+			case KEY_RIGHT:
+                i--;
+                break;
+			case KEY_UP:
+                i--;
+                break;
+			case KEY_DOWN:
+                i--;
+                break;
+			case KEY_BACKSPACE:
+				if(i > 0){	
+				backspace();
+				i = i - 2;
+				}
 
-        for(int i = 0; i <= SIZE - 1; i++){
-            char input = getch();//get char from user
-            if (input == ';' || i == SIZE - 1){//copy stopper
-                printw("Copying finished.");
-                pasted[i] = ';';//definate semicolon entered
-                i = SIZE;//double assurance for falling out of loop
-                break;//fall out of loop
-            }
-            else{
-                pasted[i] = input;//char from user entered
+
+				break;
+            case 59:
+                pasted[i] = input;
+                k = i;
+		i = SIZE; 
+		break;
+            default:
+                pasted[i] = input;
+                insertchar(input);//puts char on screen
+                break;
             }
         }
+        for(int j = 0; j < k + 35; j++){//deletes what you entered and the printw line
+            backspace();
+        }//gets rid of text
     }//copy
     else if(choice == 'p'){
         for(int i = 0; i < SIZE - 1; i++){
-            if(pasted[i] == ';'){//check for end line char
-                i = SIZE;//double assurance for falling out of loop
+            if(pasted[i] == ';')//check for end line char
                 break;//stops at semicolon if you don't use entire array
-            }
             else
                 insertchar(pasted[i]);
         }//uses insertchar because that's technically happening anyway
