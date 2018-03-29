@@ -126,21 +126,26 @@ int main()
 			case 'S':
 			savefile(win);
 			break;
+      case 'C': //copy text
+      copy(win);
+      break;
+      case 'P': //paste text
+      paste(win);
+      break;
 			case 'R': // search and replace
-            			wprintw(win, "Find a word: ");
-            			fgets(old, sizeof(old), stdin);
-           			old[strlen(old) - 1] = '\0';
-            			wprintw(win, "Enter the new word");
-            			fgets(new, sizeof(new), stdin);
-            			new[strlen(new) - 1]  = '\0';
+      wprintw(win, "Find a word: ");
+      fgets(old, sizeof(old), stdin);
+      old[strlen(old) - 1] = '\0';
+      wprintw(win, "Enter the new word");
+      fgets(new, sizeof(new), stdin);
+      new[strlen(new) - 1]  = '\0';
 
-            			if(strlen(old) != strlen(new)){
-                			printf("Error size");
-                		break;
-            			}
-            			searchReplace(filename, old, new);
-            		break;
-			
+      if(strlen(old) != strlen(new)){
+      printf("Error size");
+      break;
+      }
+      searchReplace(filename, old, new);
+      break;		
 			default: // invalid
 			mvwprintw(stdscr, 62, 0, "Invalid Command.");
 			wmove(win, y, x);
@@ -152,3 +157,4 @@ int main()
 	fclose(file);
 	return 0;
 }
+

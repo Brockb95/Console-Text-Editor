@@ -4,6 +4,8 @@
 int y, x;
 char mode; // stores the current mode of the editor
 char * buffer;
+const int SIZE = 1001;
+char pasted[SIZE] = ';';//array for copy and paste
 /* move*() functions move the cursor one space*/
 void moveup(); // move up in stdscr
 void wmoveup(WINDOW * win); // move up in window 'win'
@@ -33,6 +35,9 @@ void savefile(WINDOW * win);  // saves file
 
 void commandmodeon(WINDOW * win); // enable command mode
 void commandmodeoff(WINDOW * win); // disable command mode
+
+void copy(WINDOW * win);//saves contents of user entered data
+void paste(WINDOW * win);//prints it out based on arguments
 
 void write_to_file(const char *);
 int fsize(const char *);
