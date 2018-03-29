@@ -1,11 +1,11 @@
 #include <ncurses.h>
 #include <stdlib.h>
+#define SIZE 1001
 
+char pasted[SIZE];//array for copy and paste
 int y, x;
 char mode; // stores the current mode of the editor
-char * buffer;
-const int SIZE = 1001;
-char pasted[SIZE] = ';';//array for copy and paste
+char * buffer, filename;
 /* move*() functions move the cursor one space*/
 void moveup(); // move up in stdscr
 void wmoveup(WINDOW * win); // move up in window 'win'
@@ -31,15 +31,15 @@ void winsertline(WINDOW * win); // insert a line into window 'win'
 void insertchar(char c); // inserts a character 'c' at current position
 void winsertchar(WINDOW * win, char c); // inserts a character 'c' into window 'win'
 
-void savefile(WINDOW * win);  // saves file
+void printbuffer();
+
+void savefile();
 
 void commandmodeon(WINDOW * win); // enable command mode
 void commandmodeoff(WINDOW * win); // disable command mode
 
+
 void copy(WINDOW * win);//saves contents of user entered data
 void paste(WINDOW * win);//prints it out based on arguments
-
-void write_to_file(const char *);
-int fsize(const char *);
-void searchReplace(const char *, const char *, const char *);
+void intial();//initalizes global variables
 
