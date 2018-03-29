@@ -74,7 +74,7 @@ void wbackspace(WINDOW * win){
 	getyx(win, y, x);
 	mvwdelch(win, y, x - 1);
 }
-// insert a character and shift line to the right
+// irt a character and shift line to the right
 void insertchar(char c){
 	getyx(stdscr, y, x);
 	insch(c);
@@ -103,89 +103,51 @@ void commandmodeoff(WINDOW * win){
 	wmove(win, y, x);
 	mode = 'i';
 }
-
-void searchReplace(const char* str,const char* old, const char* new){
-    FILE *original, *temp;
+//to search and replace
+void searchReplace(char* str, const char* old, const char* new){
     char choice;
-    if(choice == 'R'){
+    while (choice == 'R' || choice == 'r'){
 
-    	if((original = fopen(str, "r")) == NULL){
-        perror(str);
-        exit(1);
-    }
+    	int old_len, new_len;
+    	char *s, *d;
+    	char * tmpbuf;
 
-    if((temp = fopen("temp.txt", "w")) == NULL){
-        perror("text");
-        exit(1);
-    }
+    	if (!str || !*str || !old || !*old || !new)
+		return;
+    	tmpbuf = malloc(strlen(str) + 1);
+    	if (tmpbuf == NULL)
+		return;
 
-    const int BUFFER_SIZE = fsize(str);
-    char *buffer = malloc(BUFFER_SIZE);
-    char *init_loc = buffer;
+    	old_len = strlen(old);
+    	new_len = strlen(new);
 
-    int word_len = strlen(old);
-    int counter = 0;
-
-    while(fgets(buffer, BUFFER_SIZE, original)){
-        while((buffer = strstr(buffer, old))){
-            memcpy(buffer, new, word_len);
-            counter++;
-        }
-        buffer = init_loc;
-        fprintf(temp, "%s", buffer);
-    }
-    printf("'%s' found %i times\n", old, counter);
-
-    fclose(original);
-    fclose(temp);
-
-    if((original = fopen(str, "w")) == NULL){
-        perror(str);
-        exit(1);
-    }
-
-    if((temp = fopen("temp.txt", "r")) == NULL){
-        perror("text");
-        exit(1);
-    }
-
-    int c;
-    while((c = fgetc(temp)) != EOF){
-        fputc(c, original);
-    }
+    	s = str;
+    	d = tmpbuf;
+ 
+    	while(*s){
+		if(strncmp(s, old, old_len) == 0){
+        		strcpy(d, new);
+   			s += old_len;
+			d += new_len;
+        	}
+		else
+			*d++ = *s++;
+   	}
+		*d = '\0';
+		strcpy(str, tmpbuf);
+		free(tmpbuf);
+       
+     }  
 }
-
-    fclose(original);
-    fclose(temp);
-    free(buffer);
-
-}	
-
-int fsize(const char *str){
-    FILE *f;
-    if((f = fopen(str, "r")) == NULL){
-        perror(str);
-        exit(1);
-    }
-    fseek(f, 0, SEEK_END);
-    int size = ftell(f);
-    fclose(f);
-    return size;
+void writer(char* str){
+	FILE* in;
+	if((in = fopen("file2.txt", "w")) == NULL){
+		printf("error...");
+		exit(1);
+	}
+	int c;
+	while((c = getchar()) != EOF)
+		fputc(c, in);
+	printf(str, in);
+	fclose(in);
 }
-
-void write_to_file(const char *str){
-    FILE *in;
-    char choice;
-    if (choice == 'W'){
-    if((in = fopen(str, "w")) == NULL){
-        perror(str);
-        exit(1);
-    }
-    int c;
-    while((c = getchar()) != EOF){
-        fputc(c, in);
-    }
-}
-    fclose(in);
-}
-

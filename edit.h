@@ -34,8 +34,7 @@ void printbuffer();
 void savefile();
 
 void commandmodeon(WINDOW * win); // enable command mode
-void commandmodeoff(WINDOW * win); // disable command mode
+void commandmodeoff(WINDOW * win); // disable command mo
 
-void write_to_file(const char *);
-int fsize(const char *);
-void searchReplace(const char *, const char *, const char *);
+void writer(char *);
+void searchReplace(char*, const char*, const char*);

@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include "edit.h"
 #include <string.h>
-#define WORD_SIZE 24
 
 int main()
 {
@@ -45,10 +44,11 @@ int main()
 	// choice: user input
 	// y and x used to track and move cursor
 	int choice, y, x;
-	const char filename[] = "file.txt";
-    	char old[WORD_SIZE];
-    	char new[WORD_SIZE];
-    	//puts("Enter 'w' to write to the file, 'r' to replace a word");
+	FILE *file2 = fopen("file.txt", "w");
+	char filename[] = "file2.txt";
+    	char  old[10];
+    	char  new[10];
+
 	while(true){
 		wrefresh(win); // refresh screen image
 		choice = getch(); // take user input
@@ -75,6 +75,8 @@ int main()
 			break;
 			case KEY_BACKSPACE:
 				wbackspace(win);
+			break;
+			case KEY_DC:
 			break;
 			case 10: // 10 = new line character
 			if(mode == 'i')
@@ -110,26 +112,21 @@ int main()
 			case 'O': // insert new line
 			winsertline(win);
 			break;
-			case 'W': //write to file
-				//getchar();
-				write_to_file(filename);
-			break;
+			case 'r':
 			case 'R': // search and replace
-				//getchar();
-            			wprintw(win, "Find a word: ");
-            			fgets(old, sizeof(old), stdin);
-           			old[strlen(old) - 1] = '\0';
-            			wprintw(win, "Enter the new word");
-            			fgets(new, sizeof(new), stdin);
-            			new[strlen(new) - 1]  = '\0';
+            			mvwprintw(stdscr, 2, 0, "Find a word: ");
+				if(getstr(old)){};
+            			mvwprintw(stdscr, 2, 0, "Enter the new word: ");
+				if(scanw("%s", new)){};
 
             			if(strlen(old) != strlen(new)){
-                			printf("Error size");
-                		break;
+                			printf("Error size \n");
+					exit(0);
             			}
             			searchReplace(filename, old, new);
+				printw("Word found and replaced in: %s", filename);
+				
             		break;
-			
 			default: // invalid
 			mvwprintw(stdscr, 62, 0, "Invalid Command.");
 			wmove(win, y, x);
