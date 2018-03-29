@@ -2,18 +2,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "edit.h"
-#include <string.h>
+
 #define WORD_SIZE 24
+
+void InitializeCurse(){
+	initscr();
+	cbreak();
+	noecho();
+	keypad(stdscr, true);
+}
 
 int main()
 {
-	initscr();
-	cbreak();	
-	noecho();
-	keypad(stdscr, true);
 	/* mode variable is declared in "edit.h"
 	default mode is insert mode */
 	mode = 'i';
+
+	char * filename = "file.txt";
+	printw("Group 7: %s", filename);
+	mvwprintw(stdscr, 1, 0, "Insert Mode: "); // default is Insert mode
+
+	getmaxyx(stdscr, y, x);	
+	WINDOW * win = newwin(MAX_ROW_EDIT, MAX_COL_EDIT, 3, 0); // create new window
+
 	
 	char * fn = "Group 7 is gay";
 	printw("Group 7: %s", fn);
@@ -29,7 +40,7 @@ int main()
 	
 	// open a file with read and write permission
 	char read;
-	FILE* file = fopen("file.txt", "r+");
+	FILE* file = fopen(filename, "r+");
 	if (file == NULL){
 		wprintw(win, "No file..\n");
 		wrefresh(win);
@@ -45,7 +56,6 @@ int main()
 	// choice: user input
 	// y and x used to track and move cursor
 	int choice, y, x;
-	const char filename[] = "file.txt";
     	char old[WORD_SIZE];
     	char new[WORD_SIZE];
     	//puts("Enter 'w' to write to the file, 'r' to replace a word");
@@ -111,11 +121,12 @@ int main()
 			winsertline(win);
 			break;
 			case 'W': //write to file
-				//getchar();
-				write_to_file(filename);
+			write_to_file(filename);
+			break;
+			case 'S':
+			savefile(win);
 			break;
 			case 'R': // search and replace
-				//getchar();
             			wprintw(win, "Find a word: ");
             			fgets(old, sizeof(old), stdin);
            			old[strlen(old) - 1] = '\0';
