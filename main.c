@@ -2,15 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "edit.h"
+#include "buffer.h"
 #include <string.h>
 #define WORD_SIZE 24
 
-int main()
-{
+void InitializeCurse(){
 	initscr();
 	cbreak();
 	noecho();
 	keypad(stdscr, true);
+}
+
+int main()
+{
+	InitializeCurse();
 	/* mode variable is declared in "edit.h"
 	default mode is insert mode */
 	mode = 'i';
@@ -19,7 +24,7 @@ int main()
 	mvwprintw(stdscr, 1, 0, "Insert Mode: "); // default is Insert mode
 
 	getmaxyx(stdscr, y, x);	
-	WINDOW * win = newwin(50, 80, 3, 0); // create new window
+	WINDOW * win = newwin(MAX_ROW_EDIT, MAX_COL_EDIT, 3, 0); // create new window
 	refresh(); // refresh stdscr
 
 	// create default border around 'win'
@@ -113,7 +118,7 @@ int main()
 				write_to_file(filename);
 			break;
 			case 'S':
-				savefile(win);
+			savefile(win);
 			break;
 			case 'R': // search and replace
 				//getchar();

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "edit.h"
+#include "buffer.h"
 
 // move the cursor up one position
 void moveup()
@@ -89,31 +90,31 @@ void winsertchar(WINDOW* win, char c){
 
 // saves window (exluding title) to text file
 void savefile(WINDOW * win){
+    struct buffer buff = {.row = MAX_ROW_EDIT, .col = MAX_COL_EDIT};
     char filename[20];
     mvwprintw(stdscr, 0, 25,  "Enter file name to be saved: ");
     echo(); // echo user input for file name
     getstr(filename);
     noecho(); 
     FILE* file2 = fopen(filename, "w+");
-    char buffer[3200];
     int i, j;
     int k = 0;
-    for (i = 0; i < 40; i++){
-        for (j = 0; j < 80; j++){
-            if ((j+1) % 80 == 0)    // insert new line to buffer at end of line
-                buffer[k] = '\n';
+    for (i = 0; i < (buff.row - 10); i++) {  // row - 10 because first line is a border
+        for (j = 0; j < buff.col; j++){
+            if ((j+1) % buff.col == 0)    // insert new line to buffer at end of line
+                buff.text[k] = '\n';
             else {
             // extract character from ncurses WINDOW win and insert to array
-            buffer[k]  = mvwinch(win, (i+1) , j) & A_CHARTEXT; 
+            buff.text[k]  = mvwinch(win, (i+1) , j) & A_CHARTEXT; 
             }
             k++;    
         }   
     }
     for (i = 0; i < 3200; i++){
-        fprintf(file2, "%c", buffer[i]);    
+        fprintf(file2, "%c", buff.text[i]);    
     }
     fclose(file2);
-    mvwprintw(stdscr, 0, 25, "                  File Saved              "); 
+    mvwprintw(stdscr, 0, 25, "                  File Saved                  "); 
 }
 // enable command mode
 void commandmodeon(WINDOW * win){
