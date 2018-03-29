@@ -1,126 +1,144 @@
 #include <ncurses.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include "edit.h"
-#include "buffer.h"
+#include <string.h>
+#define WORD_SIZE 24
 
 int main()
 {
-    initscr();
-	cbreak();	
+	initscr();
+	cbreak();
 	noecho();
 	keypad(stdscr, true);
-
-	// mode variable is declared in "edit.h"
-	// default mode is insert mode 
+	/* mode variable is declared in "edit.h"
+	default mode is insert mode */
 	mode = 'i';
+	char * filename = "file.txt";
+	printw("Group 7: %s", filename);
+	mvwprintw(stdscr, 1, 0, "Insert Mode: "); // default is Insert mode
 
+	getmaxyx(stdscr, y, x);	
+	WINDOW * win = newwin(50, 80, 3, 0); // create new window
+	refresh(); // refresh stdscr
 
+	// create default border around 'win'
+	wborder(win, ' ', ' ', '-', ' ', '-', ' ', '-', ' ');
+	wrefresh(win);
+	
 	// open a file with read and write permission
 	char read;
-	FILE* file = fopen("file.txt", "r+");
-
+	FILE* file = fopen(filename, "r+");
 	if (file == NULL){
-		printw("No file..\n");
+		wprintw(win, "No file..\n");
+		wrefresh(win);
 		exit(0);
 	}
-	
-	// seeks end of file
-	fseek(file, 0, SEEK_END);
-	// get size of file
-	size = ftell(file);
-	rewind(file);
-	// allocate space for buffer
-	buffer = malloc((size + 1) * sizeof(*buffer));
-	// write file to buffer
-	fread(buffer, size, 1, file);
-	// print buffer to ncurses window
-	printw("%s\n", buffer); 
-
-	
-
+	wmove(win, 1, 0); // don't overwrite top border
+	// display the file in new ncurses window
+	read = fgetc(file);
+	while(read != EOF){
+		wprintw(win, "%c", read);
+		read = fgetc(file);
+	}
 	// choice: user input
 	// y and x used to track and move cursor
-	int choice, y, x, len;
+	int choice, y, x;
+    	char old[WORD_SIZE];
+    	char new[WORD_SIZE];
+    	//puts("Enter 'w' to write to the file, 'r' to replace a word");
 	while(true){
-		refresh(); // refresh screen image
+		wrefresh(win); // refresh screen image
 		choice = getch(); // take user input
-		getyx(stdscr, y, x); // find cursor position
+		getyx(win, y, x); // find cursor position
 		//if insert mode
-		
 		if(mode == 'i')
 		switch(choice){
-			case 27:		// ESC key
-			commandmodeon();
+			case 27:
+			commandmodeon(win);
 			break;
 			case KEY_LEFT:
-			moveleft();
+			wmoveleft(win);
 			break;
 			case KEY_RIGHT:
-			moveright();
+			wmoveright(win);
 			break;	
 			case KEY_UP:
-			moveup();
+			if (y > 1)
+				wmoveup(win);
 			break;
 			case KEY_DOWN:
-			movedown();
+			if (y < 48)
+				wmovedown(win);
 			break;
 			case KEY_BACKSPACE:
-			backspace();
+				wbackspace(win);
 			break;
 			case 10: // 10 = new line character
-			if(mode == 'i'){
-				insertline();
-			}
+			if(mode == 'i')
+				winsertline(win);
 			break;
 			default: // if no special cases insert character
-			//returns 1 if failed, 0 if succeeded
-			insertchar(choice); 
-			len = strlen(buffer);
-     		buffer[len] = choice;
-     		buffer[len+1] = '\0';
+				winsertchar(win, choice);
 			break;
 		}
 		//if command mode
 		else
 		switch(choice){
 			case KEY_LEFT:
-			moveleft();
+			wmoveleft(win);
 			break;
 			case KEY_RIGHT:
-			moveright();
+			wmoveright(win);
 			break;	
 			case KEY_UP:
-			moveup();
+			if (y > 1)
+				wmoveup(win);
 			break;
 			case KEY_DOWN:
-			movedown();
+			if(y < 48)
+				wmovedown(win);
 			break;
 			case 'I': // disable command mode
-			commandmodeoff();
+			commandmodeoff(win);
 			break;
 			case 'X': // delete current line
-			deleteline();
-			break;
-			case 'S':
-			file = fopen("file.txt", "w");
-			fprintf(file, "%s\n", buffer);
-			fclose(file); 
-			endwin();
-			return 0;	
+			wdeleteline(win);
 			break;
 			case 'O': // insert new line
-			insertline();
+			winsertline(win);
 			break;
+			case 'W': //write to file
+				//getchar();
+				write_to_file(filename);
+			break;
+			case 'S':
+				savefile(win);
+			break;
+			case 'R': // search and replace
+				//getchar();
+            			wprintw(win, "Find a word: ");
+            			fgets(old, sizeof(old), stdin);
+           			old[strlen(old) - 1] = '\0';
+            			wprintw(win, "Enter the new word");
+            			fgets(new, sizeof(new), stdin);
+            			new[strlen(new) - 1]  = '\0';
+
+            			if(strlen(old) != strlen(new)){
+                			printf("Error size");
+                		break;
+            			}
+            			searchReplace(filename, old, new);
+            		break;
+			
 			default: // invalid
-			mvprintw(31, 0, "Invalid Command.");
-			move(y, x);
+			mvwprintw(stdscr, 62, 0, "Invalid Command.");
+			wmove(win, y, x);
 			break;
 		}
 	}
 	endwin();
 	
-	fclose(file); 
+	fclose(file);
 	return 0;
 }
