@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "edit.h"
+#include "buffer.h"
 
 // move the cursor up one position
 void moveup()
