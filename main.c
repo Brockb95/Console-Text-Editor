@@ -12,29 +12,45 @@ int main()
 	/* mode variable is declared in "edit.h"
 	default mode is insert mode */
 	mode = 'i';
+
+	char * fn = "Group 7 is gay";
+	printw("Group 7: %s", fn);
+	mvwprintw(stdscr, 1, 0, "Insert Mode: "); // default is Insert mode
+
+	getmaxyx(stdscr, y, x);
+	WINDOW * win = newwin(50, 80, 3, 0); // create new window
+	refresh(); // refresh stdscr
+
+	// create default border around 'win'
+	wborder(win, ' ', ' ', '-', ' ', '-', ' ', '-', ' ');
+	wrefresh(win);
+
 	// open a file with read and write permission
 	char read;
 	FILE* file = fopen("file.txt", "r+");
 	if (file == NULL){
-		printw("No file..\n");
+		wprintw(win, "No file..\n");
+		wrefresh(win);
 		exit(0);
 	}
+	wmove(win, 1, 0); // don't overwrite top border
 	// display the file in new ncurses window
 	read = fgetc(file);
 	while(read != EOF){
-		printw("%c", read);
+		wprintw(win, "%c", read);
 		read = fgetc(file);
 	}
 	// choice: user input
 	// y and x used to track and move cursor
 	int choice, y, x;
-	const int SIZE = 1001;//size of copy array
-	char pasted[SIZE];//array that holds copying data
-	pasted[0] = ';';//keeps you from printing garbage without copying anything first
+	const char filename[] = "file.txt";
+	// choice: user input
+	// y and x used to track and move cursor
+	int choice, y, x;
 	while(true){
-		refresh(); // refresh screen image
+		wrefresh(win); // refresh screen image
 		choice = getch(); // take user input
-		getyx(stdscr, y, x); // find cursor position
+		getyx(win, y, x); // find cursor position
 		//if insert mode
 		if(mode == 'i')
 		switch(choice){
@@ -42,61 +58,70 @@ int main()
                 commandmodeon();
                 break;
 			case KEY_LEFT:
-                moveleft();
+                wmoveleft(win);
                 break;
 			case KEY_RIGHT:
-                moveright();
+                wmoveright(win);
                 break;
 			case KEY_UP:
-                moveup();
+                if (y > 1)
+                    wmoveup(win);
                 break;
 			case KEY_DOWN:
-                movedown();
+                if (y < 48)
+                    wmovedown(win);
                 break;
 			case KEY_BACKSPACE:
-				backspace();
+				wbackspace(win);
+                break;
+            case KEY_DC:
+                wdelete(win);
                 break;
 			case 10: // 10 = new line character
 			if(mode == 'i')
-				insertline();
+				winsertline(win);
                 break;
 			default: // if no special cases insert character
-				insertchar(choice);
+				winsertchar(win, choice);
                 break;
 		}
 		//if command mode
 		else
 		switch(choice){
 			case KEY_LEFT:
-                moveleft();
+                wmoveleft(win);
                 break;
 			case KEY_RIGHT:
-                moveright();
+                wmoveright(win);
                 break;
 			case KEY_UP:
-                moveup();
+                if (y > 1)
+                    wmoveup(win);
                 break;
 			case KEY_DOWN:
-                movedown();
+                if(y < 48)
+                    wmovedown(win);
                 break;
+            case KEY_DC://handles the delete key
+                wdelete(win);
 			case 'I': // disable command mode
-                commandmodeoff();
+                commandmodeoff(win);
                 break;
 			case 'X': // delete current line
-                deleteline();
+                wdeleteline(win);
                 break;
 			case 'O': // insert new line
-                insertline();
+                winsertline(win);
                 break;
             case 'C': //copy text
-                copyPaste('c', SIZE, pasted);
+                copy(win);
                 break;
             case 'P': //paste text
-                copyPaste('p', SIZE, pasted);
+                paste(win);
                 break;
 			default: // invalid
-                mvprintw(31, 0, "Invalid Command.");
-                move(y, x);
+                mvwprintw(stdscr, 62, 0, "Invalid Command.");
+                wmove(win, y, x);
                 break;
 		}
 	}
