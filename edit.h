@@ -37,3 +37,4 @@ void commandmodeoff(WINDOW * win); // disable command mode
 void write_to_file(const char *);
 int fsize(const char *);
 void searchReplace(const char *, const char *, const char *);
+
