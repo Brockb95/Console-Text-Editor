@@ -1,3 +1,4 @@
+#files: edit.h, edit.c, main.c
 CC=gcc
 LIBS=-lncurses
 
