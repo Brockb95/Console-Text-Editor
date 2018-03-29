@@ -5,13 +5,6 @@
 
 #define WORD_SIZE 24
 
-void InitializeCurse(){
-	initscr();
-	cbreak();
-	noecho();
-	keypad(stdscr, true);
-}
-
 int main()
 {
 	/* mode variable is declared in "edit.h"
